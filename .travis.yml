@@ -7,7 +7,7 @@ install:
   - pip install -r requirements.txt
   - pip install coverage flake8 mock funcsigs
 before_script:
-  - cp cap/config/config.example.py cap/config/config.py
+  - cp cap/config/config-example.py cap/config/config.py
   - cp cap/config/celery-example.py cap/config/celery.py
   - flake8 .
 script: nosetests -v --cover-erase --with-coverage --cover-package=cap
