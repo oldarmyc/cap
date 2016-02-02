@@ -4,7 +4,6 @@ MarkupSafe
 Werkzeug
 itsdangerous
 pymongo==2.8
-wsgiref
 gunicorn
 happymongo
 Flask-WTF
