@@ -1,0 +1,16 @@
+
+celery:
+  build: .
+  volumes:
+    - .:/cap
+  command: celery -A cap.tasks worker -l info
+
+web:
+  build: .
+  command: python runapp.py
+  ports:
+    - "5006:5006"
+  volumes:
+    - .:/cap
+  links:
+    - celery
