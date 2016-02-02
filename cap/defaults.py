@@ -14,7 +14,7 @@
 
 
 from flask.ext.cloudadmin.defaults import check_and_initialize
-from config import config
+from cap.config import config
 
 
 def application_initialize(db, app):
