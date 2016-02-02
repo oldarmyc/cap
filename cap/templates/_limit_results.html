@@ -1,0 +1,48 @@
+{%- if data is defined %}
+    {%- set product = generate_product_data(data) %}
+    {%- if product %}
+        <div class="panel panel-default limit-panel-display">
+            <div class="panel-heading">
+                <h4>
+                    {{ product.title }}<a href="{{ product.doc_url }}" class="title-text-links title-text-first tooltip-title" title="API Documentation" target="_blank">Docs</a>
+                    {%- if product.pitchfork_url %}<a href="{{ product.pitchfork_url }}" class="title-text-links tooltip-title" title="API Call Details" target="_blank">API Call</a>&nbsp;&nbsp;{% endif -%}
+                </h4>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed value-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="center">Limit</th>
+                            <th class="center">Used</th>
+                            <th class="center">Used %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%- for limit in product.limit_maps %}
+                            <tr>
+                                <td>{{ limit.title }}</td>
+                                <td class="center">{{ data[product.db_name]['limits'][limit.title] }}</td>
+                                {%- if limit.value_key or data[product.db_name]['values'].get(limit.title) %}
+                                    {% set percentage, class = determine_color_class(data[product.db_name]['limits'][limit.title], data[product.db_name]['values'][limit.title]) %}
+                                    <td class="{{ class }} center">{{ data[product.db_name]['values'][limit.title] if data[product.db_name]['values'][limit.title] != 0 else '-' }}</td>
+                                    <td class="{{ class }} center">{{ percentage if percentage != '0%' else '-' }}</td>
+                                {% else %}
+                                    <td class="center">-</td>
+                                    <td class="center">-</td>
+                                {% endif -%}
+                            </tr>
+                        {% endfor -%}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif -%}
+{% endif -%}
+{% block jquery %}
+    <script>
+        $(document).ready(function() {
+            $('.tooltip-title').tooltip();
+        });
+    </script>
+{% endblock %}

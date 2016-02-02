@@ -1,0 +1,156 @@
+{% extends "_base.html" %}
+{% block title %} - {{ title }}{% endblock %}
+{% block addHeaders %}
+    <link href="{{ url_for('static', filename='css/product.css') }}" rel="stylesheet">
+{% endblock %}
+{% block body %}
+	<h1>
+        {{ title }}
+        <a class="btn btn-primary add-menu-button" data-toggle="modal" data-target="#manage_product">Settings</a>
+        <a class="btn btn-default add-menu-button" href="/manage/products">All Products</a>
+    </h1>
+    {%- if product %}
+        <h4 class="product-header">Product Settings</h4>
+        <dl class="dl-horizontal product-settings">
+            <dt>Title:</dt>
+            <dd>
+                {{ product.title }}
+            </dd>
+            <dt>DB Name:</dt>
+            <dd>
+                {{ product.db_name }}
+            </dd>
+            <dt>US URL:</dt>
+            <dd>
+                {{ product.us_url }}
+            </dd>
+            <dt>UK URL:</dt>
+            <dd>
+                {{ product.uk_url }}
+            </dd>
+            <dt>Doc URL:</dt>
+            <dd>
+                {{ product.doc_url }}
+            </dd>
+            <dt>Pitchfork URL:</dt>
+            <dd>
+                {{ product.pitchfork_url }}
+            </dd>
+            <dt>Require Region:</dt>
+            <dd>
+                {%- if product.require_region %}
+                    <span class="fa fa-check text-success"></span>
+                {% else %}
+                    <span class="fa fa-minus text-danger"></span>
+                {% endif -%}
+            </dd>
+            <dt>Active:</dt>
+            <dd>
+                {%- if product.active %}
+                    <span class="fa fa-check text-success"></span>
+                {% else %}
+                    <span class="fa fa-minus text-danger"></span>
+                {% endif -%}
+            </dd>
+        </dl>
+        <h4 class="product-header">Mapped Limits</h4>
+        {%- if product.limit_maps|length > 0 %}
+            <table class="table table-hover table-condensed">
+                <thead>
+                    <tr>
+                        <th>Limit</th>
+                        <th>URI</th>
+                        <th>Path</th>
+                        <th>Type</th>
+                        <th>Limit</th>
+                        <th>Value</th>
+                        <th class="center">Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%- for limit in product.limit_maps %}
+                        <tr>
+                            <td>
+                                {{ limit.title }}
+                            </td>
+                            <td>
+                                {{ limit.uri }}
+                            </td>
+                            <td>
+                                {{ limit.absolute_path }}
+                            </td>
+                            <td>
+                                {{ limit.absolute_type }}
+                            </td>
+                            <td>
+                                {{ limit.limit_key }}
+                            </td>
+                            <td>
+                                {{ limit.value_key }}
+                            </td>
+                            <td class="center">
+                                {%- if limit.active %}
+                                    <span class="fa fa-check text-success"></span>
+                                {% else %}
+                                    <span class="fa fa-minus text-danger"></span>
+                                {% endif -%}
+                            </td>
+                        </tr>
+                    {% endfor -%}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <strong>Warning!</strong> No limit mapping have been assigned to this product
+                </div>
+            </div>
+        {% endif -%}
+    {% else %}
+        <div class="panel panel-info" style="width: 475px;">
+            <div class="panel-body text-info">
+                Product not setup. Add product settings to setup new product.
+            </div>
+        </div>
+    {% endif -%}
+    <div id="manage_product" class="modal fade" aria-labelledby="AddForm" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4>Product Settings - Limits</h4>
+                </div>
+                <div class="modal-body">
+                    {%- set modal = True %}
+                    {%- set form_id = 'manage_product_form' %}
+                    {%- include 'generic/_form.html' %}
+                </div>
+                <div class="modal-footer">
+                    <input class="btn btn-primary" id="manage_product_submit" name="submit" type="submit" form="manage_product_form" value="Submit">
+                    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block jquery %}
+<script>
+    $(document).ready(function() {
+        $('.tooltip-title').tooltip();
+    });
+
+    $('#manage_product_submit').click(function() {
+        $("#manage_product_form").unbind('submit').bind('submit', function(e){
+            return true;
+        });
+    });
+
+    $('body').on('shown.bs.modal', '.modal', function () {
+        $('#title').focus();
+    });
+
+    $('body').on('hidden.bs.modal', '.modal', function () {
+        $(this).removeData();
+    });
+</script>
+{% endblock %}

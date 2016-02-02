@@ -1,0 +1,132 @@
+{% extends "_base.html" %}
+{% block title %} - Manage Limits{% endblock %}
+{% block addHeaders %}
+{% endblock %}
+{% block body %}
+	<h1>
+		Manage Limits
+		<a class="btn btn-primary add-menu-button" data-toggle="modal" data-target="#add_limit">Add Limit</a>
+	</h1>
+    <h4>Current Limit Mappings</h4>
+    {%- if limits.count() > 0 %}
+        <table class="table table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Title</th>
+					<th>URI</th>
+                    <th>Absolute Path</th>
+					<th>Absolute Type</th>
+					<th>Limit Key</th>
+					<th>Value Key</th>
+					<th class="center">Active</th>
+					<th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {%- for limit in limits %}
+                    <tr>
+                        <td>
+                            {{ get_product_title(limit.get('product')) }}
+                        </td>
+                        <td>
+                            {{ limit.get('title') }}
+                        </td>
+						<td>
+                            {{ limit.get('uri') }}
+                        </td>
+						<td>
+							{{ limit.get('absolute_path') }}
+						</td>
+						<td>
+							{{ limit.get('absolute_type') }}
+						</td>
+						<td>
+							{{ limit.get('limit_key') }}
+						</td>
+						<td>
+							{{ limit.get('value_key') if limit.get('value_key') else '-' }}
+						</td>
+						<td class="center">
+							{%- if limit.get('active') %}
+								<a href="/manage/limits/deactivate/{{ limit.get('_id') }}" class="tooltip-title" title="Deactivate"><span class="fa fa-check text-success"></span></a>
+							{% else %}
+								<a href="/manage/limits/activate/{{ limit.get('_id') }}" class="tooltip-title" title="Activate"><span class="fa fa-minus text-danger"></span></a>
+							{% endif -%}
+						</td>
+						<td>
+							<a href="/manage/limits/{{ limit.get('_id') }}" data-toggle="modal" data-target="#edit_limit" class="tooltip-title" title="Edit Limit"><span class="fa fa-pencil"></span></a>
+							<a href="/manage/limits/delete/{{ limit.get('_id') }}" class="tooltip-title" title="Delete Limit"><span class="fa fa-trash-o"></span></a>
+						</td>
+                    </tr>
+                {% endfor -%}
+            </tbody>
+        </table>
+    {% else %}
+		<div class="panel panel-danger">
+			<div class="panel-heading">
+				<strong>Warning!</strong> There are currently no limits setup for existing products in the system
+			</div>
+		</div>
+    {% endif -%}
+
+	<div id="add_limit" class="modal fade" aria-labelledby="AddForm" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4>Add Limit</h4>
+                </div>
+                <div class="modal-body">
+                    {%- set modal = True %}
+                    {%- set form_id = 'add_limit_form' %}
+                    {%- include 'generic/_form.html' %}
+                </div>
+                <div class="modal-footer">
+                    <input class="btn btn-primary" id="add_limit_submit" name="submit" type="submit" form="add_limit_form" value="Submit">
+                    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<div id="edit_limit" class="modal fade" aria-labelledby="EditForm" aria-hidden="true">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	                <h4>Edit Limit</h4>
+	            </div>
+	            <div class="modal-body">
+	            </div>
+	            <div class="modal-footer">
+	                <input class="btn btn-primary" id="edit_limit_submit" name="submit" type="submit" form="edit_limit_form" value="Submit">
+	                <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Cancel</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+
+{% endblock %}
+{% block jquery %}
+    <script>
+        $(document).ready(function() {
+            $('.tooltip-title').tooltip();
+        });
+
+		$('#add_limit_submit').click(function() {
+            $("#add_limit_form").unbind('submit').bind('submit', function(e){
+                return true;
+            });
+        });
+
+		$('body').on('shown.bs.modal', '.modal', function () {
+            $('#name').focus();
+        });
+
+		$('body').on('hidden.bs.modal', '.modal', function () {
+            $(this).removeData();
+        });
+    </script>
+{% endblock %}

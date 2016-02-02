@@ -1,0 +1,181 @@
+{% extends "_base.html" %}
+{% block title %} - Query Limits{% endblock %}
+{% block addHeaders %}
+    <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
+{% endblock %}
+{% block body %}
+    <div id="generated_messages_product">&nbsp;</div>
+    <h2>Query Limits</h2>
+    <div id="global_vars">
+        <input id="token" name="token" type="hidden" value="{{ session.get('token') }}"></input>
+        <input id="ddi" name="ddi" type="hidden" value="{{ session.get('ddi') }}"></input>
+        <label class="region-label">Region:</label>
+        <select id="region" name="region" data-title="Region is required.">
+            <option value="none" selected="selected">Select Region</option>
+            {%- for option in regions %}
+                <option value="{{ option.get('abbreviation')|lower }}">{{ option.get('abbreviation') }}</option>
+            {% endfor -%}
+        </select>
+    </div>
+    <div>
+        <form method="POST" class="form-horizontal" id="query_limit_form" role="form">
+            {{ form.hidden_tag() }}
+            <h4>
+                Cloud Products - <label class="control-label toggle-all">Toggle All</label><input type="checkbox" id="select_all_products" />
+            </h4>
+            {% for field in form if field.widget.input_type not in ['hidden', 'submit'] %}
+                {%- if loop.index % 3 == 1 %}
+                    <div class="row">
+                {% endif -%}
+                    <div class="form-group{% if field.errors %} has-error has-feedback{% endif %} col-md-2" id="{{ field.name }}_top">
+                        {{ field.label(class="col-sm-7 control-label") }}
+                        <div class="col-xs-2">
+                            {% include 'generic/_form_fields.html' %}
+                        </div>
+                    </div>
+                {%- if loop.index % 3 == 0 or loop.last %}
+                    </div>
+                {% endif -%}
+            {% endfor %}
+            <div class="form-group">
+                <div class="col-xs-2">
+                    <button class="btn btn-primary query-submit" id="query_limit_submit" name="submit" type="submit" form="query_limit_form">Query Limits</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="limit-results" id="limit_result_area">
+        <h3>Query Results</h3>
+        <div class="row">
+            {%- for field in form if field.widget.input_type not in ['hidden', 'submit'] %}
+                <div class="col-md-4 limit-col-block limit-key-{{ field.name }}" id="{{ field.description }}">
+                    <h4 id="limit_heading">{{ field.label }}</h4>
+                    <div id="limit_body">
+                        <span class="text-info limit-loading"><i class="fa fa-cog fa-spin fa-2x"></i></span>
+                    </div>
+                </div>
+            {% endfor -%}
+        </div>
+    </div>
+{% endblock %}
+{% block jquery %}
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#token').focus();
+        });
+
+        $('#select_all_products').click(function(e) {
+            if( this.checked ) {
+                $(':checkbox').each(function() {
+                    this.checked = true;
+                });
+            } else {
+                $(':checkbox').each(function() {
+                    this.checked = false;
+                });
+            }
+        });
+
+        function validate_field(field_name) {
+            if ( $.trim($('#' + field_name).val()) !== '' & $('#' + field_name).val().length !== 0 & $.trim($('#' + field_name).val()) !== 'none' ) {
+                $('#' + field_name).tooltip('destroy')
+                    .removeClass('error')
+                    .data('trigger', '');
+                return true
+            }
+            else {
+                $('#' + field_name).tooltip('destroy')
+                    .addClass('error')
+                    .data('trigger', 'manual')
+                    .data('placement', 'bottom')
+                    .tooltip('show');
+                return false
+            }
+        }
+
+        function check_for_existing_data() {
+            if ( $('.limit-col-block').is(':visible') ){
+                var results_div = document.getElementsByClassName('limit-col-block');
+                for (var i=0; i <  results_div.length; ++i) {
+                    var div = results_div[i];
+                    div.innerHTML = (
+                        '<h4 id="limit_heading">' + div.id + '</h4>' +
+                        '<div id="limit_body"><span class="text-info ' +
+                        'limit-loading"><i class="fa fa-cog fa-spin ' +
+                        'fa-2x"></i></span></div>'
+                    )
+                }
+                $('.limit-col-block').hide();
+                $('.limit-results').hide();
+            }
+        }
+
+        $('#query_limit_submit').click(function() {
+            $("#query_limit_form").unbind('submit').bind('submit', function(e){
+                e.preventDefault();
+                if ( (validate_field('token') && validate_field('ddi') && validate_field('region')) === false ) {
+                    return false
+                }
+                check_for_existing_data();
+                var data = {
+                    token: $('#token').val(),
+                    ddi: $('#ddi').val(),
+                    region: $('#region').val(),
+                };
+                $( this ).serializeArray().map(function(x){data[x.name] = x.value;});
+                $.ajax({
+                    url: '/query/',
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    beforeSend: function() {
+                        $('#generated_messages').html('&nbsp;');
+                        change_to_loading_button('query-submit', 'Querying API');
+                    }
+                }).done(function(result) {
+                    if (result.tasks.length > 0) {
+                        $('.limit-results').show();
+                        for (var i in result.tasks) {
+                            var limit_key = Object.keys(result.tasks[i])[0];
+                            $('.limit-key-' + limit_key).show();
+                            update_page_limits(result.tasks[i][limit_key], limit_key);
+                        }
+                        reset_button_state('query-submit', 'Query Limits');
+                    } else {
+                        reset_button_state('query-submit', 'Query Limits');
+                        show_message('There was an issue handing off the task. Please refresh page and try again.', 'error');
+                    }
+                }).fail(function(result) {
+                    reset_button_state('query-submit', 'Query Limits');
+                    show_message(result.responseJSON.message, 'error');
+                });
+            });
+        });
+
+        function update_page_limits(task_id, limit_key) {
+            var status_url = '/query/status/' + task_id;
+            $.getJSON(status_url, function(data) {
+                if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
+                    if ('result' in data) {
+                        $('.limit-key-' + limit_key).html(data['result']);
+                    }
+                    else {
+                        $('.limit-key-' + limit_key).html(
+                            '<span class="text-danger limit-error-message">' +
+                            '<i class="fa fa-exclamation-triangle"></i>&nbsp;' +
+                            '&nbsp;An error has occurred retrieveing the ' +
+                            'limits!</span>'
+                        )
+                    }
+                }
+                else {
+                    // rerun in 2 seconds
+                    setTimeout(function() {
+                        update_page_limits(task_id, limit_key);
+                    }, 2000);
+                }
+            });
+        }
+    </script>
+{% endblock %}

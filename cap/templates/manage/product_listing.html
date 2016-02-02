@@ -1,0 +1,121 @@
+{% extends "_base.html" %}
+{% block title %} - Products{% endblock %}
+{% block addHeaders %}
+	<link href="{{ url_for('static', filename='css/product.css') }}" rel="stylesheet">
+{% endblock %}
+{% block body %}
+	<h1>All Products</h1>
+    {%- if products.count() > 0 %}
+		<h4>Current Products</h4>
+		{%- for product in products %}
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title product-manage">
+						<a href="/manage/product/{{ product.get('db_name') }}" title="{{ product.get('title') }}">{{ product.get('title') }}</a>
+					</h4>
+				</div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-md-6">
+							<dl class="dl-horizontal all-products">
+								<dt>US URL:</dt>
+								<dd>
+									{{ product.get('us_url') }}
+								</dd>
+								<dt>UK URL:</dt>
+								<dd>
+									{{ product.get('uk_url') }}
+								</dd>
+								<dt>Doc URL:</dt>
+								<dd>
+									{{ product.get('doc_url') }}
+								</dd>
+								<dt>Pitchfork URL:</dt>
+								<dd>
+									{{ product.get('pitchfork_url') }}
+								</dd>
+								<dt>Require Region:</dt>
+								<dd>
+									{%- if product.get('require_region') %}
+										<span class="fa fa-check text-success"></span>
+									{% else %}
+										<span class="fa fa-minus text-danger"></span>
+									{% endif -%}
+								</dd>
+								<dt>Active:</dt>
+								<dd>
+									{%- if product.get('active') %}
+										<span class="fa fa-check text-success"></span>
+									{% else %}
+										<span class="fa fa-minus text-danger"></span>
+									{% endif -%}
+								</dd>
+							</dl>
+						</div>
+						<div class="col-md-6">
+							{%- set limit_maps = get_limit_maps(product) %}
+							{%- if limit_maps.count() > 0 %}
+								<table class="table table-hover table-condensed">
+									<thead>
+										<tr>
+											<th>Limit</th>
+											<th>URI</th>
+											<th>Path</th>
+											<th>Type</th>
+											<th>Limit Key</th>
+											<th>Value Key</th>
+										</tr>
+									</thead>
+									<tbody>
+										{%- for limit in limit_maps %}
+											<tr>
+												<td>
+													{{ limit.get('title') }}
+												</td>
+												<td>
+													{{ limit.get('uri') }}
+												</td>
+												<td>
+													{{ limit.get('absolute_path') }}
+												</td>
+												<td>
+													{{ limit.get('absolute_type') }}
+												</td>
+												<td>
+													{{ limit.get('limit_key') }}
+												</td>
+												<td>
+													{{ limit.get('value_key') if limit.get('value_key') else '-' }}
+												</td>
+											</tr>
+										{% endfor -%}
+									</tbody>
+								</table>
+							{% else %}
+								<div class="panel panel-danger">
+									<div class="panel-heading">
+										<strong>Warning!</strong> No limit mappings have been setup for this product
+									</div>
+								</div>
+							{% endif -%}
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endfor -%}
+    {% else %}
+		<div class="panel panel-danger">
+			<div class="panel-heading">
+				<strong>Warning!</strong> No products have been setup in the system
+			</div>
+		</div>
+    {% endif -%}
+
+{% endblock %}
+{% block jquery %}
+    <script>
+        $(document).ready(function() {
+            $('.tooltip-title').tooltip();
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,25 @@
+/* Product Settings */
+.product-settings dt {
+    text-align: left;
+    width: 140px;
+}
+
+.product-settings dd {
+    margin-left: 140px;
+}
+
+.product-manage > a {
+    color: #337ab7;
+}
+
+.all-products {
+    margin-top: 10px;
+}
+
+.all-products dt {
+    width: 120px;
+}
+
+.all-products dd {
+    margin-left: 140px;
+}
