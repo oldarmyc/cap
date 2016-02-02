@@ -9,7 +9,7 @@ web:
   build: .
   command: python runapp.py
   ports:
-    - "5006:5006"
+    - "5000:5000"
   volumes:
     - .:/cap
   links:
