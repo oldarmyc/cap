@@ -101,6 +101,95 @@ def application_initialize(db, app):
                             ]
                         },
                     ],
+                    "menu": [
+                        {
+                            "name": "Query Limits",
+                            "parent": "",
+                            "url": "/query/",
+                            "parent_order": 1,
+                            "db_name": "query",
+                            "active": True,
+                            "divider": False,
+                            "order": 2,
+                            "permissions": "logged_in"
+                        }, {
+                            "url": "/admin/users/admins",
+                            "db_name": "manage_admins",
+                            "name": "Manage Admins",
+                            "parent": "system",
+                            "active": True,
+                            "parent_order": 2,
+                            "order": 1,
+                            "permissions": "administrators"
+                        }, {
+                            "url": "/admin/users/exemptions",
+                            "db_name": "manage_exemptions",
+                            "name": "Manage Exemptions",
+                            "parent": "system",
+                            "active": True,
+                            "parent_order": 2,
+                            "order": 2,
+                            "permissions": "administrators",
+                            "divider": True
+                        }, {
+                            "name": "Manage Products",
+                            "parent": "system",
+                            "url": "/manage/products",
+                            "parent_order": 2,
+                            "db_name": "manage_products",
+                            "active": True,
+                            "divider": False,
+                            "order": 3,
+                            "permissions": "administrators"
+                        }, {
+                            "name": "Manage Limits",
+                            "parent": "system",
+                            "url": "/manage/limits",
+                            "parent_order": 2,
+                            "db_name": "manage_limits",
+                            "active": True,
+                            "divider": False,
+                            "order": 4,
+                            "permissions": "administrators"
+                        }, {
+                            "name": "Manage Regions",
+                            "parent": "system",
+                            "url": "/manage/regions",
+                            "parent_order": 2,
+                            "db_name": "manage_regions",
+                            "active": True,
+                            "divider": False,
+                            "order": 5,
+                            "permissions": "administrators"
+                        }, {
+                            "url": "/admin/general/",
+                            "db_name": "general_settings",
+                            "name": "General Settings",
+                            "parent": "administrators",
+                            "active": True,
+                            "parent_order": 3,
+                            "order": 1,
+                            "permissions": "administrators"
+                        }, {
+                            "url": "/admin/menu/",
+                            "db_name": "menu_settings",
+                            "name": "Menu Settings",
+                            "parent": "administrators",
+                            "active": True,
+                            "parent_order": 3,
+                            "order": 2,
+                            "permissions": "administrators"
+                        }, {
+                            "url": "/admin/roles",
+                            "db_name": "manage_roles",
+                            "name": "Manage Roles",
+                            "parent": "administrators",
+                            "active": True,
+                            "parent_order": 3,
+                            "order": 3,
+                            "permissions": "administrators"
+                        }
+                    ]
                 }
             }
         )
