@@ -9,9 +9,11 @@
         <div class="container">
             <h1 class="site-header">{{ app_title }}</h1>
             {{ app_well|safe }}
-            {% if not session.get('username') %}
+            {% if not session.get('username') -%}
                 <p><button class="btn btn-primary login-check" title="Login to Application">Login to Application</button></p>
-            {% endif %}
+            {% else %}
+                <p><a href="/query/" class="btn btn-info" title="Start Limits Queries">Start Limit Queries</a></p>
+            {% endif -%}
         </div>
     </div>
 {% endblock %}
