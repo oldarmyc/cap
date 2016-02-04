@@ -144,7 +144,7 @@
                         reset_button_state('query-submit', 'Query Limits');
                     } else {
                         reset_button_state('query-submit', 'Query Limits');
-                        show_message('There was an issue handing off the task. Please refresh page and try again.', 'error');
+                        show_message('<strong>Error!</strong> There was an issue handing off the task, or no products were chosen. Please try again.', 'error');
                     }
                 }).fail(function(result) {
                     reset_button_state('query-submit', 'Query Limits');
