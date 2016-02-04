@@ -53,6 +53,20 @@ Within the cap/config directory you will need to make a config.py and celery.py 
 **MONGO_PORT** : Database port to use if different than 27017  
 **MONGO_DATABASE** : Database name to use and the default is cap  
 
+##### Adding products with limits
+
+[CAP Products and Limits](http://a370f2615ebe532b4bde-56882658ef09db12255ddddb1928252a.r62.cf5.rackcdn.com/cap_products_limits.tar.gz)
+
+The download above will provide all of the mongodb bson files for each of the Rackspace products with the mappings for the limits. Once you download the files you can do the following to restore all of the product and limit collections to the cap database. This assumes the database name used is cap, and if it has changed then you will need to alter the command below.
+
+```
+tar xzvf cap_products_limits.tar.gz
+mongorestore -d cap --drop cap_products_limits/
+```
+
+**Note:** If you have added your own products/limits into the collections you can omit the --drop in the call above, and the products and limits will be added to the existing collection.
+
+
 ##### Using Docker Compose
 
 If you have docker and docker compose on your local system I provided the files needed to build the application. You will need a mongo and rabbitMQ system running as well before you run the docker compose commands, and both are required.
