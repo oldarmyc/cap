@@ -13,8 +13,8 @@
 # limitations under the License.
 
 
-from fixtures.test_product import sample_log, sample_auth_failure
-from cap.setup_application import create_app
+from fixtures import test_product
+from cap import setup_application
 from cap.config import config
 from uuid import uuid4
 
@@ -53,7 +53,7 @@ class UITests(unittest.TestCase):
         else:
             test_db = config.MONGO_DATABASE
 
-        self.cap, self.db = create_app(test_db)
+        self.cap, self.db = setup_application.create_app(test_db)
         self.app = self.cap.test_client()
         self.app.get('/')
 
@@ -336,7 +336,7 @@ class UITests(unittest.TestCase):
         del log_entry['_id']
         del log_entry['queried_at']
         self.assertEquals(
-            sample_log,
+            test_product.sample_log,
             log_entry,
             'Log does not match expected value'
         )
@@ -367,7 +367,7 @@ class UITests(unittest.TestCase):
         log_entry = self.db.query_logs.find_one()
         self.assertEquals(
             returned,
-            sample_auth_failure,
+            test_product.sample_auth_failure,
             'Invalid response received from successfull query submit'
         )
         self.assertEquals(

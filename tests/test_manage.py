@@ -13,8 +13,8 @@
 # limitations under the License.
 
 
-from fixtures.test_product import sample_product, sample_limit
-from cap.setup_application import create_app
+from fixtures import test_product
+from cap import setup_application
 from cap.config import config
 from uuid import uuid4
 
@@ -38,7 +38,7 @@ class CapManageTests(unittest.TestCase):
         else:
             test_db = config.MONGO_DATABASE
 
-        self.cap, self.db = create_app(test_db)
+        self.cap, self.db = setup_application.create_app(test_db)
         self.app = self.cap.test_client()
         self.app.get('/')
 
@@ -613,7 +613,7 @@ class CapManageTests(unittest.TestCase):
         del product['_id']
         self.assertEquals(
             product,
-            sample_product,
+            test_product.sample_product,
             'Product added does not match expected product'
         )
 
@@ -785,7 +785,7 @@ class CapManageTests(unittest.TestCase):
         del limit['_id']
         self.assertEquals(
             limit,
-            sample_limit,
+            test_product.sample_limit,
             'Limit added does not match expected limit'
         )
 
