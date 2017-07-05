@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from flask.ext.cloudadmin.defaults import check_and_initialize
+from flask_cloudadmin.defaults import check_and_initialize
 from cap.config import config
 
 

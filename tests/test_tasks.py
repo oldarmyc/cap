@@ -13,16 +13,7 @@
 # limitations under the License.
 
 
-from fixtures.test_product import (
-    dns, dns_limit, dns_limit_return, dns_list_return, dns_full_return,
-    autoscale, autoscale_limit, autoscale_limit_return, autoscale_list_return,
-    autoscale_full_return, big_data, big_data_limit, big_data_limit_return,
-    big_data_full_return, cbs, cbs_limit, cbs_limit_return, cbs_full_return,
-    clb, clb_limit, clb_limit_return, clb_list_return, clb_full_return,
-    server, server_limit, server_list_return, server_limit_return,
-    server_flavor_return, server_full_return, server_list_processed_return,
-    network_list_return, network_processed_list
-)
+from fixtures import test_product
 from cap import setup_application
 from datetime import datetime
 from uuid import uuid4
@@ -215,8 +206,8 @@ class CapCeleryTests(unittest.TestCase):
     """ DNS """
 
     def test_dns_success(self):
-        self.db.products.insert(dns)
-        self.db.limit_maps.insert(dns_limit)
+        self.db.products.insert(test_product.dns)
+        self.db.limit_maps.insert(test_product.dns_limit)
         log_id = self.setup_usable_log('dns')
         with self.app.test_client() as c:
             with c.session_transaction() as sess:
@@ -229,7 +220,7 @@ class CapCeleryTests(unittest.TestCase):
             ):
                 with mock.patch('requests.get') as patched_get:
                     patched_get.return_value.content = json.dumps(
-                        dns_limit_return
+                        test_product.dns_limit_return
                     )
                     patched_get.return_value.status_code = 200
                     with mock.patch('cap.tasks.gather_dns_domains') as count:
@@ -241,11 +232,11 @@ class CapCeleryTests(unittest.TestCase):
                             'dns',
                             log_id
                         )
-        assert return_value == dns_full_return, (
+        assert return_value == test_product.dns_full_return, (
             'Returned value did not match expected value'
         )
         log = self.db.query_logs.find_one()
-        assert log.get('query_results')[0] == dns_full_return, (
+        assert log.get('query_results')[0] == test_product.dns_full_return, (
             'Logged results do not match expected return'
         )
 
@@ -261,7 +252,7 @@ class CapCeleryTests(unittest.TestCase):
             ):
                 with mock.patch('requests.get') as patched_get:
                     patched_get.return_value.content = json.dumps(
-                        dns_list_return
+                        test_product.dns_list_return
                     )
                     patched_get.return_value.status_code = 200
                     return_value = self.tasks.gather_dns_domains(
@@ -274,8 +265,8 @@ class CapCeleryTests(unittest.TestCase):
     """ Autoscale """
 
     def test_autoscale_success(self):
-        self.db.products.insert(autoscale)
-        self.db.limit_maps.insert(autoscale_limit)
+        self.db.products.insert(test_product.autoscale)
+        self.db.limit_maps.insert(test_product.autoscale_limit)
         log_id = self.setup_usable_log('autoscale')
         with self.app.test_client() as c:
             with c.session_transaction() as sess:
@@ -288,7 +279,7 @@ class CapCeleryTests(unittest.TestCase):
             ):
                 with mock.patch('requests.get') as patched_get:
                     patched_get.return_value.content = json.dumps(
-                        autoscale_limit_return
+                        test_product.autoscale_limit_return
                     )
                     patched_get.return_value.status_code = 200
                     with mock.patch('cap.tasks.gather_autoscale_groups') as c:
@@ -301,11 +292,13 @@ class CapCeleryTests(unittest.TestCase):
                             log_id
                         )
 
-        assert return_value == autoscale_full_return, (
+        assert return_value == test_product.autoscale_full_return, (
             'Returned value did not match expected value'
         )
         log = self.db.query_logs.find_one()
-        assert log.get('query_results')[0] == autoscale_full_return, (
+        self.assertEqual(
+            log.get('query_results')[0],
+            test_product.autoscale_full_return,
             'Logged results do not match expected return'
         )
 
@@ -321,7 +314,7 @@ class CapCeleryTests(unittest.TestCase):
             ):
                 with mock.patch('requests.get') as patched_get:
                     patched_get.return_value.content = json.dumps(
-                        autoscale_list_return
+                        test_product.autoscale_list_return
                     )
                     patched_get.return_value.status_code = 200
                     return_value = self.tasks.gather_autoscale_groups(
@@ -335,8 +328,8 @@ class CapCeleryTests(unittest.TestCase):
     """ Big Data """
 
     def test_big_data_success(self):
-        self.db.products.insert(big_data)
-        self.db.limit_maps.insert(big_data_limit)
+        self.db.products.insert(test_product.big_data)
+        self.db.limit_maps.insert(test_product.big_data_limit)
         log_id = self.setup_usable_log('big_data')
         with self.app.test_client() as c:
             with c.session_transaction() as sess:
@@ -349,7 +342,7 @@ class CapCeleryTests(unittest.TestCase):
             ):
                 with mock.patch('requests.get') as patched_get:
                     patched_get.return_value.content = json.dumps(
-                        big_data_limit_return
+                        test_product.big_data_limit_return
                     )
                     patched_get.return_value.status_code = 200
                     return_value = self.tasks.big_data(
@@ -360,19 +353,21 @@ class CapCeleryTests(unittest.TestCase):
                         log_id
                     )
 
-        assert return_value == big_data_full_return, (
+        assert return_value == test_product.big_data_full_return, (
             'Returned value did not match expected value'
         )
         log = self.db.query_logs.find_one()
-        assert log.get('query_results')[0] == big_data_full_return, (
+        self.assertEqual(
+            log.get('query_results')[0],
+            test_product.big_data_full_return,
             'Logged results do not match expected return'
         )
 
     """ CBS """
 
     def test_cbs_success(self):
-        self.db.products.insert(cbs)
-        self.db.limit_maps.insert(cbs_limit)
+        self.db.products.insert(test_product.cbs)
+        self.db.limit_maps.insert(test_product.cbs_limit)
         log_id = self.setup_usable_log('cbs')
         with self.app.test_client() as c:
             with c.session_transaction() as sess:
@@ -385,7 +380,7 @@ class CapCeleryTests(unittest.TestCase):
             ):
                 with mock.patch('requests.get') as patched_get:
                     patched_get.return_value.content = json.dumps(
-                        cbs_limit_return
+                        test_product.cbs_limit_return
                     )
                     patched_get.return_value.status_code = 200
                     return_value = self.tasks.big_data(
@@ -396,19 +391,19 @@ class CapCeleryTests(unittest.TestCase):
                         log_id
                     )
 
-        assert return_value == cbs_full_return, (
+        assert return_value == test_product.cbs_full_return, (
             'Returned value did not match expected value'
         )
         log = self.db.query_logs.find_one()
-        assert log.get('query_results')[0] == cbs_full_return, (
+        assert log.get('query_results')[0] == test_product.cbs_full_return, (
             'Logged results do not match expected return'
         )
 
     """ LBs """
 
     def test_load_balancers_success(self):
-        self.db.products.insert(clb)
-        self.db.limit_maps.insert(clb_limit)
+        self.db.products.insert(test_product.clb)
+        self.db.limit_maps.insert(test_product.clb_limit)
         log_id = self.setup_usable_log('load_balancers')
         with self.app.test_client() as c:
             with c.session_transaction() as sess:
@@ -421,7 +416,7 @@ class CapCeleryTests(unittest.TestCase):
             ):
                 with mock.patch('requests.get') as patched_get:
                     patched_get.return_value.content = json.dumps(
-                        clb_limit_return
+                        test_product.clb_limit_return
                     )
                     patched_get.return_value.status_code = 200
                     with mock.patch(
@@ -436,11 +431,11 @@ class CapCeleryTests(unittest.TestCase):
                             log_id
                         )
 
-        assert return_value == clb_full_return, (
+        assert return_value == test_product.clb_full_return, (
             'Returned value did not match expected value'
         )
         log = self.db.query_logs.find_one()
-        assert log.get('query_results')[0] == clb_full_return, (
+        assert log.get('query_results')[0] == test_product.clb_full_return, (
             'Logged results do not match expected return'
         )
 
@@ -456,7 +451,7 @@ class CapCeleryTests(unittest.TestCase):
             ):
                 with mock.patch('requests.get') as patched_get:
                     patched_get.return_value.content = json.dumps(
-                        clb_list_return
+                        test_product.clb_list_return
                     )
                     patched_get.return_value.status_code = 200
                     return_value = self.tasks.gather_all_load_balancers(
@@ -470,8 +465,8 @@ class CapCeleryTests(unittest.TestCase):
     """ Servers """
 
     def test_servers_success(self):
-        self.db.products.insert(server)
-        self.db.limit_maps.insert(server_limit)
+        self.db.products.insert(test_product.server)
+        self.db.limit_maps.insert(test_product.server_limit)
         log_id = self.setup_usable_log('server')
         with self.app.test_client() as c:
             with c.session_transaction() as sess:
@@ -484,17 +479,21 @@ class CapCeleryTests(unittest.TestCase):
             ):
                 with mock.patch('requests.get') as patched_get:
                     patched_get.return_value.content = json.dumps(
-                        server_limit_return
+                        test_product.server_limit_return
                     )
                     patched_get.return_value.status_code = 200
                     with mock.patch(
                         'cap.tasks.generate_server_list'
                     ) as server_list:
-                        server_list.return_value = server_list_return
+                        server_list.return_value = (
+                            test_product.server_list_return
+                        )
                         with mock.patch(
                             'cap.tasks.generate_network_list'
                         ) as network_list:
-                            network_list.return_value = network_processed_list
+                            network_list.return_value = (
+                                test_product.network_processed_list
+                            )
                             with mock.patch(
                                 'cap.tasks.generate_total_server_ram'
                             ) as ram:
@@ -507,11 +506,13 @@ class CapCeleryTests(unittest.TestCase):
                                     log_id
                                 )
 
-        assert return_value == server_full_return, (
+        assert return_value == test_product.server_full_return, (
             'Returned value did not match expected value'
         )
         log = self.db.query_logs.find_one()
-        assert log.get('query_results')[0] == server_full_return, (
+        self.assertEqual(
+            log.get('query_results')[0],
+            test_product.server_full_return,
             'Logged results do not match expected return'
         )
 
@@ -527,7 +528,7 @@ class CapCeleryTests(unittest.TestCase):
             ):
                 with mock.patch('requests.get') as patched_get:
                     patched_get.return_value.content = json.dumps(
-                        server_list_return
+                        test_product.server_list_return
                     )
                     patched_get.return_value.status_code = 200
                     return_value = self.tasks.generate_server_list(
@@ -536,7 +537,7 @@ class CapCeleryTests(unittest.TestCase):
                         'DFW'
                     )
 
-        assert return_value == server_list_processed_return, (
+        assert return_value == test_product.server_list_processed_return, (
             'Did not get expected count return on list'
         )
 
@@ -552,7 +553,7 @@ class CapCeleryTests(unittest.TestCase):
             ):
                 with mock.patch('requests.get') as patched_get:
                     patched_get.return_value.content = json.dumps(
-                        network_list_return
+                        test_product.network_list_return
                     )
                     patched_get.return_value.status_code = 200
                     return_value = self.tasks.generate_network_list(
@@ -560,7 +561,7 @@ class CapCeleryTests(unittest.TestCase):
                         'DFW'
                     )
 
-        assert return_value == network_processed_list, (
+        assert return_value == test_product.network_processed_list, (
             'Did not get expected count return on list'
         )
 
@@ -576,11 +577,11 @@ class CapCeleryTests(unittest.TestCase):
             ):
                 with mock.patch('requests.get') as patched_get:
                     patched_get.return_value.content = json.dumps(
-                        server_flavor_return
+                        test_product.server_flavor_return
                     )
                     patched_get.return_value.status_code = 200
                     return_value = self.tasks.generate_total_server_ram(
-                        server_list_processed_return,
+                        test_product.server_list_processed_return,
                         '123467',
                         uuid.uuid4().hex,
                         'DFW'

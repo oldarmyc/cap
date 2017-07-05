@@ -17,8 +17,8 @@ from flask import Flask, g
 from cap.config import config
 from datetime import timedelta
 from happymongo import HapPyMongo
-from flask.ext.cloudadmin import Admin
-from flask.ext.cloudauth import CloudAuth
+from flask_cloudadmin import Admin
+from flask_cloudauth import CloudAuth
 from cap import views, defaults, template_functions
 
 

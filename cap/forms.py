@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+    from flask_wtf import FlaskForm as Form
+except:
+    from flask.ext.wtf import Form
 
 from wtforms import fields, validators
-from flask.ext.wtf import Form
 from cap.helper import slug
 from flask import g
 

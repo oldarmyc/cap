@@ -16,9 +16,9 @@
 from flask import (
     render_template, request, redirect, g, flash, url_for, jsonify
 )
-from flask.ext.cloudadmin.decorators import check_perms
+from flask_cloudadmin.decorators import check_perms
 from cap.models import Region, Product, Limit
-from flask.ext.classy import FlaskView, route
+from flask_classy import FlaskView, route
 from cap import forms, helper, tasks
 from bson.objectid import ObjectId
 from future.utils import iteritems
