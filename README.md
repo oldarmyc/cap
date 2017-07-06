@@ -7,7 +7,6 @@ When needing to build out or scale systems for new projects or deployments, it i
 You can query all Rackspace API cloud limits for the following products:
 
 - Autoscale
-- Big Data
 - CBS
 - DNS
 - Load Balancers
@@ -27,8 +26,6 @@ The used amount and used percentage are also color coded to help you visually de
 - Yellow - 60.01% - 80% used
 - Red - 80.01% - 100% used
 
-To view the public facing application you can visit the following URL: https://cap.cloudapi.co
-
 #### Running the application locally
 
 ##### Requirements
@@ -36,76 +33,93 @@ To view the public facing application you can visit the following URL: https://c
 - Mongodb
 - RabbitMQ
 
-##### Config Files
-Within the cap/config directory you will need to make a config.py and celery.py config file that the application will use. Example files are provided and you only need to change the following values.
+##### Copy over sample configs
+````
+cp cap/config/config.example.py cap/config/config.py
+cp cap/config/celery.example.py cap/config/celery.py
+````
 
-*Change the following values in config.py for your setup:*  
-**MONGO_HOST** : IP/Host of MongoDB server is not using localhost  
-**MONGO_PORT** : Database port to use if different than 27017  
-**MONGO_DATABASE** : Database name to use and the default is cap  
-**ADMIN_USERNAME** = Username of Rackspace cloud account  
-**ADMIN_NAME** = Name of user  
-**ADMIN_EMAIL** = Email address of user  
+Change the appropriate values in each of the config files. Currently the sample configs are setup for running everything in Docker or localhost but can be changed depending on the environment.
 
-*Change the following values in celery.py for your setup:*  
-**BROKER_URL** : If not localhost then the location of your rabbitMQ server  
-**MONGO_HOST** : IP/Host of MongoDB server is not using localhost  
-**MONGO_PORT** : Database port to use if different than 27017  
-**MONGO_DATABASE** : Database name to use and the default is cap  
+___
 
-##### Adding products with limits
+#### Build the docker images
 
-[CAP Products and Limits](http://a370f2615ebe532b4bde-56882658ef09db12255ddddb1928252a.r62.cf5.rackcdn.com/cap_products_limits.tar.gz)
-
-The download above will provide all of the mongodb bson files for each of the Rackspace products with the mappings for the limits. Once you download the files you can do the following to restore all of the product and limit collections to the cap database. This assumes the database name used is cap, and if it has changed then you will need to alter the command below.
-
-```
-tar xzvf cap_products_limits.tar.gz
-mongorestore -d cap --drop cap_products_limits/
-```
-
-**Note:** If you have added your own products/limits into the collections you can omit the --drop in the call above, and the products and limits will be added to the existing collection.
-
-
-##### Using Docker Compose
-
-If you have docker and docker compose on your local system I provided the files needed to build the application. You will need a mongo and rabbitMQ system running as well before you run the docker compose commands, and both are required.
-
-Start up rabbitMQ and MongoDB
-```
-docker run --name rabbit-dev -p "15672:15672" -p "5672:5672" -p "4369:4369" -p "5671:5671" -p "25672:25672" -d rabbitmq:3
-docker run --name mongo-dev -p “27017:27017” -d mongo:3.0.2
-```
-
-Build and start up the container
+##### Start the build
 ```
 docker-compose build
-docker-compose up
 ```
 
-**Note:** That when using docker you may need to change the config file values to not point to localhost, depending on how the ports are presented on your machine.
+##### Bring the containers up and run in the background
+```
+docker-compose up -d
+```
 
-Once everything is up and running you can browse to the IP:PORT to view the application. By default the port is 5000, and can be changed in the docker-compose.yml file.
+##### Verify that everything is running
+```
+docker ps
+```
 
-##### Python virtualenv
-**Note:** The below example uses virtualenvwrapper
+You should see four containers running named cap_app, cap_celery, mongo, and rabbitmq. If all four are running then you can browse to `http://localhost:5000` to view the running application.
 
-````
-mkvirtualenv cap
-cd cap
+If you want to view the container logs in-line just omit the -d flag and it will run in the current terminal window. To stop it in this mode just use CTRL-C. If running in detached mode you can use the command `docker logs CONTAINER_ID` to view the specific container log files.
+
+If in detached mode you can use the following command to stop the containers.
+```
+docker-compose stop
+```
+___
+
+#### Running it locally?
+
+##### Setup working directory
+```
+mkdir cap
 git clone https://github.com/oldarmyc/cap.git
 cd cap
-workon cap
+```
+
+#### Setup config files
+
+##### Copy over sample configs
+````
+cp cap/config/config.example.py cap/config/config.py
+cp cap/config/celery.example.py cap/config/celery.py
 ````
 
-Install the python requirements in the virtualenv that was created previously
+Change the appropriate values in each of the config files. You will need a rabbitmq server and a mongo server to run locally. These can both be run in docker without issues to avoid having to install both services, but will need to be accessible from localhost.
+
+RabbitMQ docker example run command
+```
+docker run --name rabbit-dev -p "15672:15672" -p "5672:5672" -p "4369:4369" -p "5671:5671" -p "25672:25672" -d rabbitmq
+```
+
+MongoDB docker example run command
+```
+docker run --name mongo-dev -p "27017:27017" -d mongo
+```
+
+##### Install packages
+Install base packages needed for the application
 ```
 pip install -r requirements.txt
 ```
 
-After you have saved the config files you created above ensure that mongodb and rabbitMQ is up and running. You can run the following command to start the application.
-````
+##### Starting the application
+```
 python runapp.py
-````
+```
 
-Browse to http://localhost:5000 to view the application and login using your Cloud credentials
+___
+
+#### Running Tests
+
+##### Ensure you have the testing requirements installed
+```
+pip install -r dev-requirements.txt
+```
+
+##### Running tests with coverage report
+```
+nosetests --with-coverage --cover-erase --cover-package cap
+```
