@@ -12,8 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# MongoDB Settings
-MONGO_HOST = 'localhost'
+"""
+    The values are set to run the application either on localhost or
+    within docker using docker-compose. If you would like to run it
+    a different waay fell free to change the appropriate values.
+"""
+
+import os
+
+
+try:
+    MONGO_HOST = os.environ['CAP_DB_1_PORT_27017_TCP_ADDR']
+except:
+    MONGO_HOST = 'localhost'
+
 MONGO_PORT = 27017
 MONGO_DATABASE = 'cap'
 MONGO_KWARGS = {'tz_aware': True}

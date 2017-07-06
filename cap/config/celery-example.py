@@ -12,7 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-BROKER_URL = 'amqp://'
+"""
+    The values are set to run the application either on localhost or
+    within docker using docker-compose. If you would like to run it
+    a different waay fell free to change the appropriate values.
+"""
+
+import os
+
+
+try:
+    BROKER_URL = 'amqp://{}'.format(
+        os.environ['CAP_RABBITMQ_1_PORT_5672_TCP_ADDR']
+    )
+except:
+    BROKER_URL = 'amqp://localhost'
+
 CELERY_RESULT_BACKEND = 'amqp'
 CELERY_TASK_RESULT_EXPIRES = 300
 CELERY_RESULT_PERSISTENT = True
@@ -21,7 +36,11 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-MONGO_HOST = 'localhost'
+try:
+    MONGO_HOST = os.environ['CAP_DB_1_PORT_27017_TCP_ADDR']
+except:
+    MONGO_HOST = 'localhost'
+
 MONGO_PORT = 27017
 MONGO_USER = None
 MONGO_PASS = None
