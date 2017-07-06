@@ -46,6 +46,9 @@ class CapCeleryTests(unittest.TestCase):
         self.tasks.config.CELERY_CACHE_BACKEND = 'memory'
         self.tasks.db = self.db
 
+        self.db.products.remove({})
+        self.db.limit_maps.remove({})
+
     def tearDown(self):
         collections = [
             'settings',
@@ -292,7 +295,12 @@ class CapCeleryTests(unittest.TestCase):
                             log_id
                         )
 
-        assert return_value == test_product.autoscale_full_return, (
+        print(return_value)
+        print(test_product.autoscale_full_return)
+
+        self.assertEqual(
+            return_value,
+            test_product.autoscale_full_return,
             'Returned value did not match expected value'
         )
         log = self.db.query_logs.find_one()

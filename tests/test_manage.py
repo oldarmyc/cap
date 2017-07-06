@@ -42,6 +42,9 @@ class CapManageTests(unittest.TestCase):
         self.app = self.cap.test_client()
         self.app.get('/')
 
+        self.db.products.remove({})
+        self.db.limit_maps.remove({})
+
     def tearDown(self):
         collections = [
             'settings',
